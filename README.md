@@ -1,73 +1,96 @@
-# React + TypeScript + Vite
+# 🌊 RiegoFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 
-Currently, two official plugins are available:
+**RiegoFlow** es una plataforma moderna y minimalista diseñada para la gestión inteligente de turnos de riego. Enfocada en la eficiencia hídrica y la experiencia del usuario, permite coordinar la distribución de agua entre productores y administradores de red de manera ágil y visual.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## ✨ Características Principales
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🚜 Módulo de Productores
+- **Solicitudes de Riego:** Interfaz intuitiva para pedir turnos especificando volumen y horario.
+- **Historial de Consumo:** Visualización clara de riegos previos y estadísticas de uso.
+- **Perfil Personalizado:** Gestión de datos del productor y parcelas asociadas.
+- **Notificaciones:** Alertas en tiempo real sobre la aprobación de turnos.
 
-## Expanding the ESLint configuration
+### 🏛️ Panel de Administración
+- **Dashboard de Control:** Monitoreo en tiempo real de la demanda proyectada vs. disponibilidad de oferta.
+- **Gestión de Red:** Mapa interactivo y control de válvulas/sectores.
+- **Aprobación Inteligente:** Sistema de validación de solicitudes con prioridades programables.
+- **Configuración del Sistema:** Ajustes globales de parámetros hídricos y usuarios.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Tecnologías Utilizadas
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **Frontend:** [React.js](https://reactjs.org/) con [TypeScript](https://www.typescriptlang.org/).
+- **Estilizado:** [Tailwind CSS](https://tailwindcss.com/) para un diseño premium, dinámico y responsivo.
+- **Iconografía:** [Lucide React](https://lucide.dev/) y [Material Symbols](https://fonts.google.com/icons).
+- **Herramientas de Construcción:** [Vite](https://vitejs.dev/) para un desarrollo ultra rápido.
+- **Estado y Navegación:** [React Router Dom](https://reactrouter.com/).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 🛠️ Instalación y Configuración
+
+Sigue estos pasos para ejecutar el proyecto localmente:
+
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/Shalom198424/RiegoFlow.git
+   cd RiegoFlow
+   ```
+
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
+
+3. **Configurar el entorno:**
+   - Copia el archivo de ejemplo:
+     ```bash
+     cp .env.example .env
+     ```
+   - Edita el archivo `.env` con tus configuraciones (opcional por ahora).
+
+4. **Ejecutar en modo desarrollo:**
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 📁 Estructura del Proyecto
+
+```text
+src/
+├── components/     # Componentes reutilizables (Botones, Inputs, Logo, etc.)
+├── layouts/        # Estructuras de página (Auth y Dashboard)
+├── pages/          # Vistas principales (Login, Admin, Producer, Profile)
+├── utils/          # Funciones de ayuda y utilidades de CSS (cn)
+├── index.css       # Estilos globales y tokens de diseño Tailwind
+└── main.tsx        # Punto de entrada de la aplicación
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🎨 Diseño y UX
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+El proyecto sigue una estética **Premium Dark/Light Mode**, utilizando:
+- **Glassmorphism:** Efectos de cristal esmerilado en tarjetas y paneles.
+- **Animaciones Micro:** Transiciones suaves y efectos de flotación para elementos clave (como el Logo).
+- **Mobile First:** Diseño optimizado para dispositivos móviles, facilitando el uso en campo.
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+
+---
+
+Desarrollado con ❤️ para la gestión técnica del agua.
