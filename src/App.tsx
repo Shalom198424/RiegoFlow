@@ -1,0 +1,48 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthLayout } from './layouts/AuthLayout/AuthLayout';
+import { DashboardLayout } from './layouts/DashboardLayout/DashboardLayout';
+import { LoginPage } from './pages/Login/LoginPage';
+import { RegisterPage } from './pages/Register/RegisterPage';
+import { ProducerPage } from './pages/Producer/ProducerPage';
+import { AdminPage } from './pages/Admin/AdminPage';
+import { AdminHistoryPage } from './pages/Admin/AdminHistoryPage';
+import { AdminNetworkPage } from './pages/Admin/AdminNetworkPage';
+import { AdminSettingsPage } from './pages/Admin/AdminSettingsPage';
+import { ProfilePage } from './pages/Profile/ProfilePage';
+import { RequestIrrigationPage } from './pages/Producer/RequestIrrigationPage';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Rutas de Autenticación */}
+        <Route element={<AuthLayout />}>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Route>
+
+        {/* Rutas de Productor */}
+        <Route path="/producer" element={<DashboardLayout />}>
+          <Route index element={<ProducerPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="request" element={<RequestIrrigationPage />} />
+          <Route path="history" element={<div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">Historial de Riego (En desarrollo)</div>} />
+        </Route>
+
+        {/* Rutas de Administrador */}
+        <Route path="/admin" element={<DashboardLayout />}>
+          <Route index element={<AdminPage />} />
+          <Route path="history" element={<AdminHistoryPage />} />
+          <Route path="network" element={<AdminNetworkPage />} />
+          <Route path="settings" element={<AdminSettingsPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+        </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;

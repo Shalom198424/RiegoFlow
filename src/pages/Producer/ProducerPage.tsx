@@ -1,0 +1,139 @@
+import { useNavigate } from 'react-router-dom';
+import {
+    Droplets,
+    Calendar,
+    Plus,
+    Tractor,
+    Sprout,
+    LayoutDashboard
+} from 'lucide-react';
+
+export const ProducerPage = () => {
+    const navigate = useNavigate();
+    return (
+        <div className="max-w-md mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+
+            {/* Live Activity Section */}
+            <section className="space-y-5">
+                <h2 className="text-2xl font-black text-slate-800 dark:text-white px-1 tracking-tight">Actividad en Vivo</h2>
+
+                <div className="bg-white dark:bg-[#080808] rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/50 dark:shadow-none">
+                    {/* Header Image Part */}
+                    <div className="relative h-52 w-full overflow-hidden">
+                        <img
+                            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop"
+                            alt="Field"
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-5 left-5">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-[#4ade80] text-black rounded-full text-[11px] font-black tracking-widest shadow-lg">
+                                <div className="w-2 h-2 bg-black rounded-full animate-pulse" />
+                                TURNO ACTIVO
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Card Content */}
+                    <div className="p-7 space-y-7">
+                        <div className="space-y-1.5">
+                            <p className="text-[11px] font-black text-[#4ade80] uppercase tracking-[0.2em]">TURNO 04 • LOTE NORTE</p>
+                            <h3 className="text-3xl font-black text-slate-900 dark:text-white leading-tight">Riego en curso</h3>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-end">
+                                <span className="text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest">FINALIZACIÓN ESTIMADA</span>
+                                <span className="text-sm font-black text-[#4ade80] tracking-tighter">FALTAN 02:45:00</span>
+                            </div>
+                            <div className="h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-[#4ade80] rounded-full w-[60%] shadow-[0_0_20px_rgba(74,222,128,0.4)]" />
+                            </div>
+                        </div>
+
+                        <button className="w-full h-16 bg-[#4ade80] text-black rounded-2xl font-black text-sm flex items-center justify-center gap-3 shadow-lg shadow-[#4ade80]/20 hover:bg-[#22c55e] transition-all active:scale-[0.98]">
+                            <LayoutDashboard size={20} strokeWidth={3} className="fill-black" />
+                            Ver Telemetría
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 gap-5">
+                <div className="bg-white dark:bg-[#080808] p-7 rounded-[2.5rem] border border-slate-100 dark:border-white/5 shadow-sm space-y-5">
+                    <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <Droplets size={24} strokeWidth={2.5} />
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.2em] leading-none">USO DE AGUA</p>
+                        <p className="text-2xl font-black text-slate-900 dark:text-white leading-none tracking-tight">12.4k <span className="text-[10px] text-slate-400 uppercase">L</span></p>
+                    </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#080808] p-7 rounded-[2.5rem] border border-slate-100 dark:border-white/5 shadow-sm space-y-5">
+                    <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <Calendar size={24} strokeWidth={2.5} />
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-[10px] font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.2em] leading-none">PRÓXIMO TURNO</p>
+                        <p className="text-2xl font-black text-slate-900 dark:text-white leading-none tracking-tight">Mañana</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Big Action Button - Shared primary color */}
+            <button
+                onClick={() => navigate('/producer/request')}
+                className="w-full h-20 bg-[#4ade80] text-black rounded-full font-black text-lg flex items-center justify-center gap-4 shadow-xl shadow-[#4ade80]/20 hover:-translate-y-1 hover:bg-[#22c55e] active:scale-[0.98] transition-all"
+            >
+                <div className="bg-black/10 p-2.5 rounded-full">
+                    <Plus size={24} strokeWidth={3} />
+                </div>
+                Solicitar Riego
+            </button>
+
+            {/* Recent Requests Section */}
+            <section className="space-y-5">
+                <div className="flex justify-between items-center px-1">
+                    <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Solicitudes Recientes</h2>
+                    <button className="text-[10px] font-black text-[#4ade80] dark:text-[#4ade80]/80 border border-[#4ade80]/30 px-3 py-2 rounded-lg hover:bg-[#4ade80]/10 transition-colors uppercase tracking-widest">Ver todas</button>
+                </div>
+
+                <div className="space-y-4">
+                    {/* Request Item 1 */}
+                    <div className="bg-white dark:bg-[#080808] p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm flex items-center justify-between group hover:border-[#4ade80]/30 transition-all cursor-pointer">
+                        <div className="flex items-center gap-5">
+                            <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 dark:text-emerald-500 group-hover:bg-emerald-500/10 transition-all">
+                                <Tractor size={32} />
+                            </div>
+                            <div className="space-y-1">
+                                <p className="font-black text-slate-900 dark:text-white text-xl leading-tight">Huerta Este</p>
+                                <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">MAÑANA, 10:00 AM</p>
+                            </div>
+                        </div>
+                        <div className="px-4 py-2 border border-[#4ade80]/30 text-[#4ade80] rounded-full text-[10px] font-black uppercase tracking-[0.1em]">
+                            APROBADO
+                        </div>
+                    </div>
+
+                    {/* Request Item 2 */}
+                    <div className="bg-white dark:bg-[#080808] p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm flex items-center justify-between group hover:border-slate-300 dark:hover:border-white/10 transition-all cursor-pointer">
+                        <div className="flex items-center gap-5">
+                            <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 dark:text-slate-500">
+                                <Sprout size={32} />
+                            </div>
+                            <div className="space-y-1">
+                                <p className="font-black text-slate-900 dark:text-white text-xl leading-tight">Pastura Oeste</p>
+                                <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">VIERNES, 02:00 PM</p>
+                            </div>
+                        </div>
+                        <div className="px-4 py-2 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-gray-400 rounded-full text-[10px] font-black uppercase tracking-[0.1em]">
+                            PENDIENTE
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    );
+};
