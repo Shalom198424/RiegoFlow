@@ -1,15 +1,28 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Droplets,
     Calendar,
     Plus,
     Tractor,
-    Sprout,
-    LayoutDashboard
+    Sprout
 } from 'lucide-react';
 
 export const ProducerPage = () => {
     const navigate = useNavigate();
+    const [requests, setRequests] = useState<any[]>([]);
+
+    useEffect(() => {
+        const loadRequests = () => {
+            const data = JSON.parse(localStorage.getItem('irrigation_requests') || '[]');
+            setRequests(data);
+        };
+
+        loadRequests();
+        window.addEventListener('storage', loadRequests);
+        return () => window.removeEventListener('storage', loadRequests);
+    }, []);
+
     return (
         <div className="max-w-md mx-auto space-y-8 pb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
@@ -50,9 +63,12 @@ export const ProducerPage = () => {
                             </div>
                         </div>
 
-                        <button className="w-full h-16 bg-[#4ade80] text-black rounded-2xl font-black text-sm flex items-center justify-center gap-3 shadow-lg shadow-[#4ade80]/20 hover:bg-[#22c55e] transition-all active:scale-[0.98]">
-                            <LayoutDashboard size={20} strokeWidth={3} className="fill-black" />
-                            Ver Telemetría
+                        <button
+                            onClick={() => navigate('/producer/request')}
+                            className="w-full h-16 bg-[#4ade80] text-black rounded-2xl font-black text-sm flex items-center justify-center gap-3 shadow-lg shadow-[#4ade80]/20 hover:bg-[#22c55e] transition-all active:scale-[0.98]"
+                        >
+                            <Plus size={20} strokeWidth={3} />
+                            Solicitar Riego
                         </button>
                     </div>
                 </div>
@@ -82,15 +98,7 @@ export const ProducerPage = () => {
             </div>
 
             {/* Big Action Button - Shared primary color */}
-            <button
-                onClick={() => navigate('/producer/request')}
-                className="w-full h-20 bg-[#4ade80] text-black rounded-full font-black text-lg flex items-center justify-center gap-4 shadow-xl shadow-[#4ade80]/20 hover:-translate-y-1 hover:bg-[#22c55e] active:scale-[0.98] transition-all"
-            >
-                <div className="bg-black/10 p-2.5 rounded-full">
-                    <Plus size={24} strokeWidth={3} />
-                </div>
-                Solicitar Riego
-            </button>
+
 
             {/* Recent Requests Section */}
             <section className="space-y-5">
@@ -100,37 +108,36 @@ export const ProducerPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                    {/* Request Item 1 */}
-                    <div className="bg-white dark:bg-[#080808] p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm flex items-center justify-between group hover:border-[#4ade80]/30 transition-all cursor-pointer">
-                        <div className="flex items-center gap-5">
-                            <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 dark:text-emerald-500 group-hover:bg-emerald-500/10 transition-all">
-                                <Tractor size={32} />
-                            </div>
-                            <div className="space-y-1">
-                                <p className="font-black text-slate-900 dark:text-white text-xl leading-tight">Huerta Este</p>
-                                <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">MAÑANA, 10:00 AM</p>
-                            </div>
+                    {requests.length === 0 && (
+                        <div className="text-center py-8 text-slate-400 text-sm font-medium bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5">
+                            No tienes solicitudes recientes
                         </div>
-                        <div className="px-4 py-2 border border-[#4ade80]/30 text-[#4ade80] rounded-full text-[10px] font-black uppercase tracking-[0.1em]">
-                            APROBADO
-                        </div>
-                    </div>
+                    )}
 
-                    {/* Request Item 2 */}
-                    <div className="bg-white dark:bg-[#080808] p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm flex items-center justify-between group hover:border-slate-300 dark:hover:border-white/10 transition-all cursor-pointer">
-                        <div className="flex items-center gap-5">
-                            <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 dark:text-slate-500">
-                                <Sprout size={32} />
+                    {requests.map((req) => (
+                        <div key={req.id} className="bg-white dark:bg-[#080808] p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm flex items-center justify-between group hover:border-[#4ade80]/30 transition-all cursor-pointer">
+                            <div className="flex items-center gap-5">
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all ${req.status === 'APPROVED'
+                                        ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500'
+                                        : 'bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500'
+                                    }`}>
+                                    {req.parcelId === "1" ? <Tractor size={32} /> : <Sprout size={32} />}
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="font-black text-slate-900 dark:text-white text-xl leading-tight">{req.parcelName}</p>
+                                    <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest leading-none mt-1.5">
+                                        {req.date} • {req.duration}H
+                                    </p>
+                                </div>
                             </div>
-                            <div className="space-y-1">
-                                <p className="font-black text-slate-900 dark:text-white text-xl leading-tight">Pastura Oeste</p>
-                                <p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">VIERNES, 02:00 PM</p>
+                            <div className={`px-4 py-2 border rounded-full text-[10px] font-black uppercase tracking-[0.1em] ${req.status === 'APPROVED'
+                                    ? 'border-[#4ade80]/30 text-[#4ade80]'
+                                    : 'border-slate-200 dark:border-white/10 text-slate-500 dark:text-gray-400'
+                                }`}>
+                                {req.status === 'APPROVED' ? 'APROBADO' : 'PENDIENTE'}
                             </div>
                         </div>
-                        <div className="px-4 py-2 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-gray-400 rounded-full text-[10px] font-black uppercase tracking-[0.1em]">
-                            PENDIENTE
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </section>
 

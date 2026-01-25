@@ -16,12 +16,36 @@ export const RequestIrrigationPage = () => {
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
+    // Form State
+    const [parcelId, setParcelId] = useState("");
+    const [date, setDate] = useState("");
+    const [duration, setDuration] = useState("");
+    const [flow, setFlow] = useState("");
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
+        const newRequest = {
+            id: Math.random().toString(36).substr(2, 9).toUpperCase(),
+            producer: localStorage.getItem('userName') || "Juan Pérez", // Fallback name
+            parcelId,
+            parcelName: parcelId === "1" ? "Huerta Este" : parcelId === "2" ? "Pastura Oeste" : "Lote Norte",
+            date,
+            duration,
+            flow,
+            status: 'PENDING',
+            timestamp: new Date().toISOString()
+        };
+
         // Simular envío de solicitud
         setTimeout(() => {
+            const existingRequests = JSON.parse(localStorage.getItem('irrigation_requests') || '[]');
+            localStorage.setItem('irrigation_requests', JSON.stringify([newRequest, ...existingRequests]));
+
+            // Disparar evento para que AdminPage se actualice
+            window.dispatchEvent(new Event('storage'));
+
             setLoading(false);
             setSubmitted(true);
 
@@ -74,6 +98,8 @@ export const RequestIrrigationPage = () => {
                         <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={20} />
                         <select
                             required
+                            value={parcelId}
+                            onChange={(e) => setParcelId(e.target.value)}
                             className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 h-16 pl-12 pr-10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all appearance-none text-slate-800 dark:text-white font-bold"
                         >
                             <option value="">Elegir Parcela...</option>
@@ -93,6 +119,8 @@ export const RequestIrrigationPage = () => {
                         <input
                             type="date"
                             required
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
                             min={new Date().toISOString().split('T')[0]}
                             className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 h-16 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-slate-800 dark:text-white font-bold"
                         />
@@ -110,6 +138,8 @@ export const RequestIrrigationPage = () => {
                                 required
                                 min="1"
                                 max="24"
+                                value={duration}
+                                onChange={(e) => setDuration(e.target.value)}
                                 placeholder="Horas"
                                 className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 h-16 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-slate-800 dark:text-white font-bold placeholder:text-slate-400"
                             />
@@ -122,6 +152,8 @@ export const RequestIrrigationPage = () => {
                             <input
                                 type="number"
                                 required
+                                value={flow}
+                                onChange={(e) => setFlow(e.target.value)}
                                 placeholder="L/s"
                                 className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 h-16 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all text-slate-800 dark:text-white font-bold placeholder:text-slate-400"
                             />

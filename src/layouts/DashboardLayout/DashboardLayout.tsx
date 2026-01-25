@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Droplets, LayoutDashboard, History, LogOut, Menu, X, Settings, User, Calendar, Sun, Moon } from 'lucide-react';
+import { Droplets, LayoutDashboard, History, LogOut, Menu, X, Settings, User, Calendar, Sun, Moon, ClipboardCheck } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '../../utils/cn';
 
@@ -27,6 +27,7 @@ export const DashboardLayout = () => {
 
     const producerLinks = [
         { label: 'Solicitar Riego', icon: LayoutDashboard, href: '/producer' },
+        { label: 'Declaración DDJJC', icon: ClipboardCheck, href: '/producer/ddjjc' },
         { label: 'Mi Historial', icon: History, href: '/producer/history' },
     ];
 
@@ -38,6 +39,20 @@ export const DashboardLayout = () => {
     ];
 
     const links = isAdmin ? adminLinks : producerLinks;
+
+    const [notificationCount, setNotificationCount] = useState(2);
+
+    useEffect(() => {
+        const updateNotifications = () => {
+            const ddjjcs = JSON.parse(localStorage.getItem('ddjjc_submissions') || '[]');
+            const pending = ddjjcs.filter((d: any) => d.status === 'PENDING').length;
+            setNotificationCount(2 + pending); // Mantener las 2 fijas + las nuevas DDJJC
+        };
+
+        updateNotifications();
+        window.addEventListener('storage', updateNotifications);
+        return () => window.removeEventListener('storage', updateNotifications);
+    }, []);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-black flex">
@@ -121,9 +136,11 @@ export const DashboardLayout = () => {
                             {isDark ? <Sun size={20} strokeWidth={2.5} /> : <Moon size={20} strokeWidth={2.5} />}
                         </button>
                         <button className="relative p-2.5 bg-slate-50 dark:bg-white/5 rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 transition-all group">
-                            <div className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-white dark:border-background-dark animate-bounce-short">
-                                2
-                            </div>
+                            {notificationCount > 0 && (
+                                <div className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-white dark:border-background-dark animate-bounce-short">
+                                    {notificationCount}
+                                </div>
+                            )}
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
                         </button>
                     </div>
@@ -146,9 +163,9 @@ export const DashboardLayout = () => {
                     ]
                     : [
                         { label: 'INICIO', icon: LayoutDashboard, path: '/producer', active: location.pathname === '/producer' },
-                        { label: 'PLAN', icon: Calendar, path: '/producer/schedule', active: false },
+                        { label: 'DDJJC', icon: ClipboardCheck, path: '/producer/ddjjc', active: location.pathname === '/producer/ddjjc' },
                         { label: 'HISTORIAL', icon: History, path: '/producer/history', active: location.pathname === '/producer/history' },
-                        { label: 'PERFIL', icon: User, path: '/producer/profile', active: false }
+                        { label: 'PERFIL', icon: User, path: '/producer/profile', active: location.pathname === '/producer/profile' }
                     ]
                 ).map((item, i) => (
                     <Link

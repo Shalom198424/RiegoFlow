@@ -11,6 +11,9 @@ import { AdminSettingsPage } from './pages/Admin/AdminSettingsPage';
 import { ProfilePage } from './pages/Profile/ProfilePage';
 import { RequestIrrigationPage } from './pages/Producer/RequestIrrigationPage';
 
+import { DDJJCPage } from './pages/Producer/DDJJCPage';
+import { HistoryPage } from './pages/Producer/HistoryPage';
+
 function App() {
   return (
     <BrowserRouter>
@@ -26,7 +29,8 @@ function App() {
           <Route index element={<ProducerPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="request" element={<RequestIrrigationPage />} />
-          <Route path="history" element={<div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">Historial de Riego (En desarrollo)</div>} />
+          <Route path="ddjjc" element={<DDJJCPage />} />
+          <Route path="history" element={<HistoryPage />} />
         </Route>
 
         {/* Rutas de Administrador */}

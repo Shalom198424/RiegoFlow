@@ -1,27 +1,224 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     CheckCircle,
     Droplets,
     Calendar,
     TrendingUp,
-    Bell,
     Map as MapIcon,
-    Send
+    ClipboardCheck,
+    Clock,
+    User,
+    ArrowUpRight,
+    X,
+    FileText,
+    Download
 } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import { generateDDJJCPdf } from '../../utils/DDJJCPdfGenerator';
 
 export const AdminPage = () => {
-    const [toggles, setToggles] = useState<{ [key: string]: boolean }>({
-        '8291': true,
-        '8295': true
-    });
 
-    const toggleRequest = (id: string) => {
-        setToggles(prev => ({ ...prev, [id]: !prev[id] }));
+    const [ddjjcs, setDdjjcs] = useState<any[]>([]);
+    const [selectedDDJJC, setSelectedDDJJC] = useState<any | null>(null);
+    const [irrigationRequests, setIrrigationRequests] = useState<any[]>([]);
+
+    useEffect(() => {
+        const loadData = () => {
+            const data = JSON.parse(localStorage.getItem('ddjjc_submissions') || '[]');
+            setDdjjcs(data);
+
+            const requests = JSON.parse(localStorage.getItem('irrigation_requests') || '[]');
+            setIrrigationRequests(requests);
+        };
+
+        loadData();
+        window.addEventListener('storage', loadData);
+        return () => window.removeEventListener('storage', loadData);
+    }, []);
+
+    const handleApproveRequest = (id: string) => {
+        const updated = irrigationRequests.map(r => r.id === id ? { ...r, status: 'APPROVED' } : r);
+        localStorage.setItem('irrigation_requests', JSON.stringify(updated));
+        setIrrigationRequests(updated);
+        window.dispatchEvent(new Event('storage'));
+    };
+
+
+
+    const handleApproveDDJJC = (id: string) => {
+        const updated = ddjjcs.map(d => d.id === id ? { ...d, status: 'APPROVED' } : d);
+        localStorage.setItem('ddjjc_submissions', JSON.stringify(updated));
+        setDdjjcs(updated);
+        window.dispatchEvent(new Event('storage'));
+        if (selectedDDJJC && selectedDDJJC.id === id) {
+            setSelectedDDJJC(null);
+        }
+    };
+
+    const handleDownloadPDF = (ddjjc: any) => {
+        generateDDJJCPdf(ddjjc);
     };
 
     return (
         <div className="max-w-lg mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
+            {/* DDJJC Recent Submissions */}
+            {ddjjcs.length > 0 && (
+                <section className="space-y-4">
+                    <div className="flex justify-between items-center px-1">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                                <ClipboardCheck className="text-primary w-5 h-5" />
+                            </div>
+                            <h2 className="text-[#131614] dark:text-white text-xl font-black tracking-tight">DDJJC Recibidas</h2>
+                        </div>
+                        <div className="px-3 py-1 bg-primary text-white rounded-full text-[10px] font-black tracking-widest animate-pulse">
+                            NUEVO
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        {ddjjcs.filter(d => d.status === 'PENDING').map((ddjjc) => (
+                            <div key={ddjjc.id} className="bg-white dark:bg-[#080808] rounded-[2rem] border border-slate-100 dark:border-white/5 p-6 shadow-sm hover:shadow-md transition-all group">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center">
+                                            <User size={18} className="text-slate-400" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-black text-slate-800 dark:text-white">{ddjjc.producer}</h4>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{ddjjc.plot} • {ddjjc.canal}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase">
+                                        <Clock size={12} />
+                                        {new Date(ddjjc.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2 mb-4">
+                                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/5">
+                                        <span className="text-xs font-bold text-slate-500">Periodo declarado</span>
+                                        <span className="text-xs font-black text-slate-800 dark:text-white">{ddjjc.period}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/5">
+                                        <span className="text-xs font-bold text-slate-500">Cultivos declarados</span>
+                                        <span className="text-xs font-black text-primary">{ddjjc.crops.length} especies</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => handleApproveDDJJC(ddjjc.id)}
+                                        className="flex-1 h-12 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                    >
+                                        Aprobar DDJJC
+                                    </button>
+                                    <button
+                                        onClick={() => setSelectedDDJJC(ddjjc)}
+                                        className="h-12 w-12 bg-slate-900 dark:bg-black text-white rounded-xl flex items-center justify-center border border-white/10 hover:bg-slate-800 transition-all"
+                                    >
+                                        <ArrowUpRight size={18} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
+
+            {/* DDJJC Detail Modal */}
+            {selectedDDJJC && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-[#1a1a1a] w-full max-w-2xl rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300">
+                        <div className="p-8 pb-0">
+                            <div className="flex justify-between items-start mb-6">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <div className="p-2 bg-primary/10 rounded-lg">
+                                            <FileText className="text-primary w-5 h-5" />
+                                        </div>
+                                        <span className="text-xs font-black text-primary uppercase tracking-widest leading-none">REVISIÓN DE DOCUMENTO</span>
+                                    </div>
+                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">Declaración Jurada de Cultivos</h2>
+                                    <p className="text-slate-500 font-medium">ID: {selectedDDJJC.id} • {selectedDDJJC.timestamp.split('T')[0]}</p>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedDDJJC(null)}
+                                    className="p-2 bg-slate-100 dark:bg-white/5 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                {/* Info Grid */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Productor</label>
+                                        <p className="font-bold text-slate-800 dark:text-white">{selectedDDJJC.producer}</p>
+                                    </div>
+                                    <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Periodo</label>
+                                        <p className="font-bold text-slate-800 dark:text-white">{selectedDDJJC.period}</p>
+                                    </div>
+                                    <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Parcela</label>
+                                        <p className="font-bold text-slate-800 dark:text-white">{selectedDDJJC.plot}</p>
+                                    </div>
+                                    <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Canal</label>
+                                        <p className="font-bold text-[#19b366]">{selectedDDJJC.canal}</p>
+                                    </div>
+                                </div>
+
+                                {/* Crop Table Preview */}
+                                <div>
+                                    <h4 className="text-sm font-black text-slate-900 dark:text-white mb-3 uppercase tracking-wide">Cultivos Declarados</h4>
+                                    <div className="overflow-hidden rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 font-bold uppercase text-[10px] tracking-wider">
+                                                <tr>
+                                                    <th className="px-4 py-3">Cultivo</th>
+                                                    <th className="px-4 py-3">Sup (ha)</th>
+                                                    <th className="px-4 py-3">Fechas</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                                                {selectedDDJJC.crops.map((crop: any, i: number) => (
+                                                    <tr key={i} className="bg-white dark:bg-[#1a1a1a]">
+                                                        <td className="px-4 py-3 font-bold text-slate-700 dark:text-gray-300">{crop.cultivo}</td>
+                                                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-gray-400">{crop.superficieTotal}</td>
+                                                        <td className="px-4 py-3 font-medium text-slate-600 dark:text-gray-400 text-xs">
+                                                            {crop.desde} / {crop.hasta}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-8 bg-slate-50 dark:bg-black/20 mt-8 flex gap-4">
+                            <button
+                                onClick={() => handleDownloadPDF(selectedDDJJC)}
+                                className="flex-1 h-14 bg-white dark:bg-white/5 text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-50 transition-all"
+                            >
+                                <Download size={18} />
+                                Descargar PDF
+                            </button>
+                            <button
+                                onClick={() => handleApproveDDJJC(selectedDDJJC.id)}
+                                className="flex-[2] h-14 bg-primary text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/25 hover:bg-primary-600 transition-all flex items-center justify-center gap-2"
+                            >
+                                <CheckCircle size={18} />
+                                Aprobar Declaración
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Outlook Section */}
             <section className="space-y-4">
                 <div className="px-1">
@@ -87,162 +284,58 @@ export const AdminPage = () => {
                 <div className="flex justify-between items-center px-1">
                     <h3 className="text-[#131614] dark:text-white text-xl font-black tracking-tight">Solicitudes Pendientes</h3>
                     <div className="px-3 py-1.5 bg-[#19b366]/10 border border-[#19b366]/20 rounded-full">
-                        <span className="text-[10px] font-black text-[#19b366] uppercase tracking-widest">8 Activas</span>
+                        <span className="text-[10px] font-black text-[#19b366] uppercase tracking-widest">{irrigationRequests.filter(r => r.status === 'PENDING').length} Activas</span>
                     </div>
                 </div>
 
                 <div className="space-y-6 pb-20">
-                    {/* Card 1: High Priority */}
-                    <div className="bg-white dark:bg-[#080808] rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all group">
-                        {/* Status Header */}
-                        <div className="relative h-48 w-full bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1000&auto=format&fit=crop")' }}>
-                            <div className="absolute inset-0 bg-black/20" />
-                            <div className="absolute top-5 left-5 flex gap-2">
-                                <div className="px-3 py-1.5 bg-[#ef4444] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">PRIORIDAD ALTA</div>
-                                <div className="px-3 py-1.5 bg-black/40 backdrop-blur-md text-white rounded-full text-[10px] font-black tracking-widest">#8291</div>
-                            </div>
+                    {irrigationRequests.length === 0 && (
+                        <div className="text-center py-10 text-slate-400">
+                            No hay solicitudes pendientes.
                         </div>
+                    )}
 
-                        <div className="p-7 space-y-6">
-                            <div>
-                                <h4 className="text-[#131614] dark:text-white text-xl font-black leading-tight tracking-tight">Green Valley Estates • Plot B</h4>
-                                <div className="space-y-2 mt-4">
-                                    <div className="flex items-center gap-3">
-                                        <Droplets size={18} className="text-[#19b366]" />
-                                        <p className="text-sm font-bold text-slate-500 dark:text-gray-400">450m³ Solicitados</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Calendar size={18} className="text-[#3b82f6]" />
-                                        <p className="text-sm font-bold text-slate-500 dark:text-gray-400">04:00 AM - 08:00 AM (Mañana)</p>
-                                    </div>
+                    {irrigationRequests.filter(r => r.status === 'PENDING').map((req) => (
+                        <div key={req.id} className="bg-white dark:bg-[#080808] rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all group">
+                            {/* Visual Header */}
+                            <div className="relative h-32 w-full bg-slate-100 dark:bg-white/5 overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-r from-slate-200 to-slate-100 dark:from-white/10 dark:to-white/5" />
+                                <div className="absolute top-5 left-5 flex gap-2">
+                                    <div className="px-3 py-1.5 bg-[#ef4444] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">PRIORIDAD ALTA</div>
+                                    <div className="px-3 py-1.5 bg-black/40 backdrop-blur-md text-white rounded-full text-[10px] font-black tracking-widest">#{req.id}</div>
                                 </div>
                             </div>
 
-                            <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-3xl border border-slate-100 dark:border-white/5 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <Bell size={20} className="text-[#19b366]" strokeWidth={3} />
-                                    <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wide">Notificar Productor</span>
-                                </div>
-                                <button
-                                    onClick={() => toggleRequest('8291')}
-                                    className={cn(
-                                        "relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300",
-                                        toggles['8291'] ? "bg-[#19b366]" : "bg-slate-300 dark:bg-slate-700"
-                                    )}
-                                >
-                                    <div className={cn(
-                                        "absolute left-1.5 h-5 w-5 rounded-full bg-white flex items-center justify-center transition-all duration-300",
-                                        toggles['8291'] ? "translate-x-6" : "translate-x-0"
-                                    )}>
-                                        {toggles['8291'] && <CheckCircle size={12} className="text-[#19b366]" strokeWidth={4} />}
+                            <div className="p-7 space-y-6">
+                                <div>
+                                    <h4 className="text-[#131614] dark:text-white text-xl font-black leading-tight tracking-tight">{req.parcelName} • {req.producer}</h4>
+                                    <div className="space-y-2 mt-4">
+                                        <div className="flex items-center gap-3">
+                                            <Droplets size={18} className="text-[#19b366]" />
+                                            <p className="text-sm font-bold text-slate-500 dark:text-gray-400">{req.flow} L/s • {req.duration} Horas</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Calendar size={18} className="text-[#3b82f6]" />
+                                            <p className="text-sm font-bold text-slate-500 dark:text-gray-400">{req.date}</p>
+                                        </div>
                                     </div>
-                                </button>
-                            </div>
+                                </div>
 
-                            <div className="flex gap-3">
-                                <button className="flex-[4] h-16 bg-[#4ade80] text-black rounded-2xl font-black text-sm flex items-center justify-center gap-3 shadow-lg shadow-[#4ade80]/20 hover:bg-[#22c55e] transition-all active:scale-[0.98]">
-                                    <Calendar size={20} strokeWidth={3} />
-                                    Aprobar y Programar
-                                </button>
-                                <button className="flex-1 h-16 bg-slate-900 dark:bg-black text-white rounded-2xl flex items-center justify-center border border-white/10 hover:bg-slate-800 transition-all active:scale-[0.95]">
-                                    <MapIcon size={24} strokeWidth={2.5} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Card 2: Scheduled */}
-                    <div className="bg-[#19b366]/5 dark:bg-[#050505] rounded-[2.5rem] overflow-hidden border border-[#19b366]/20 dark:border-[#19b366]/10 shadow-sm relative">
-                        <div className="relative h-44 w-full bg-cover bg-center grayscale-[0.3]" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1523348837708-15d4a09cfac2?q=80&w=1000&auto=format&fit=crop")' }}>
-                            <div className="absolute inset-0 bg-black/30" />
-                            <div className="absolute top-5 left-5 flex gap-2">
-                                <div className="px-3 py-1.5 bg-white/10 backdrop-blur-md text-white/80 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">ESTÁNDAR</div>
-                                <div className="px-3 py-1.5 bg-black/40 backdrop-blur-md text-white rounded-full text-[10px] font-black tracking-widest">#8304</div>
-                            </div>
-                            <div className="absolute top-5 right-5">
-                                <div className="flex items-center gap-2 px-4 py-2 bg-[#4ade80] text-black rounded-full text-[10px] font-black tracking-widest shadow-lg">
-                                    <CheckCircle size={14} strokeWidth={3} />
-                                    PROGRAMADO Y NOTIFICADO
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => handleApproveRequest(req.id)}
+                                        className="flex-[4] h-16 bg-[#4ade80] text-black rounded-2xl font-black text-sm flex items-center justify-center gap-3 shadow-lg shadow-[#4ade80]/20 hover:bg-[#22c55e] transition-all active:scale-[0.98]"
+                                    >
+                                        <Calendar size={20} strokeWidth={3} />
+                                        Aprobar y Programar
+                                    </button>
+                                    <button className="flex-1 h-16 bg-slate-900 dark:bg-black text-white rounded-2xl flex items-center justify-center border border-white/10 hover:bg-slate-800 transition-all active:scale-[0.95]">
+                                        <MapIcon size={24} strokeWidth={2.5} />
+                                    </button>
                                 </div>
                             </div>
                         </div>
-
-                        <div className="p-7 space-y-5">
-                            <h4 className="text-[#131614] dark:text-white text-xl font-black tracking-tight leading-tight">Sunset Vineyard • North Block</h4>
-
-                            <div className="p-4 bg-[#19b366]/10 border border-[#19b366]/20 rounded-2xl flex items-center gap-3">
-                                <Send size={16} className="text-[#19b366]" strokeWidth={3} />
-                                <span className="text-xs font-bold text-[#19b366] leading-none uppercase tracking-wide">Alerta enviada correctamente vía SMS y Push</span>
-                            </div>
-
-                            <div className="flex gap-3 pt-2">
-                                <button className="flex-1 h-12 border-2 border-[#19b366] text-[#19b366] rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#19b366]/5 transition-all">
-                                    Ver Comprobante
-                                </button>
-                                <button className="flex-1 h-12 bg-slate-900/10 dark:bg-white/5 text-slate-500 dark:text-gray-400 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-900/20 dark:hover:bg-white/10 transition-all">
-                                    Modificar Turno
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Card 3: Recurring */}
-                    <div className="bg-white dark:bg-[#080808] rounded-[2.5rem] overflow-hidden border border-slate-100 dark:border-white/5 shadow-xl transition-all group">
-                        <div className="relative h-48 w-full bg-cover bg-center" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop")' }}>
-                            <div className="absolute inset-0 bg-black/20" />
-                            <div className="absolute top-5 left-5 flex gap-2">
-                                <div className="px-3 py-1.5 bg-blue-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">RECURRENTE</div>
-                                <div className="px-3 py-1.5 bg-black/40 backdrop-blur-md text-white rounded-full text-[10px] font-black tracking-widest">#8295</div>
-                            </div>
-                        </div>
-
-                        <div className="p-7 space-y-6">
-                            <div>
-                                <h4 className="text-[#131614] dark:text-white text-xl font-black leading-tight tracking-tight">Wheat Ridge • Zona 4</h4>
-                                <div className="space-y-2 mt-4">
-                                    <div className="flex items-center gap-3">
-                                        <Droplets size={18} className="text-[#19b366]" />
-                                        <p className="text-sm font-bold text-slate-500 dark:text-gray-400">1.200m³ Solicitados</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <Calendar size={18} className="text-[#3b82f6]" />
-                                        <p className="text-sm font-bold text-slate-500 dark:text-gray-400">08:00 PM - 02:00 AM (Día Siguiente)</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="p-5 bg-slate-50 dark:bg-white/5 rounded-3xl border border-slate-100 dark:border-white/5 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <Bell size={20} className="text-[#19b366]" strokeWidth={3} />
-                                    <span className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wide">Notificar Productor</span>
-                                </div>
-                                <button
-                                    onClick={() => toggleRequest('8295')}
-                                    className={cn(
-                                        "relative inline-flex h-8 w-14 items-center rounded-full transition-all duration-300",
-                                        toggles['8295'] ? "bg-[#19b366]" : "bg-slate-300 dark:bg-slate-700"
-                                    )}
-                                >
-                                    <div className={cn(
-                                        "absolute left-1.5 h-5 w-5 rounded-full bg-white flex items-center justify-center transition-all duration-300",
-                                        toggles['8295'] ? "translate-x-6" : "translate-x-0"
-                                    )}>
-                                        {toggles['8295'] && <CheckCircle size={12} className="text-[#19b366]" strokeWidth={4} />}
-                                    </div>
-                                </button>
-                            </div>
-
-                            <div className="flex gap-3">
-                                <button className="flex-[4] h-16 bg-[#4ade80] text-black rounded-2xl font-black text-sm flex items-center justify-center gap-3 shadow-lg shadow-[#4ade80]/20 hover:bg-[#22c55e] transition-all active:scale-[0.98]">
-                                    <Calendar size={20} strokeWidth={3} />
-                                    Aprobar y Programar
-                                </button>
-                                <button className="flex-1 h-16 bg-slate-900 dark:bg-black text-white rounded-2xl flex items-center justify-center border border-white/10 hover:bg-slate-800 transition-all active:scale-[0.95]">
-                                    <MapIcon size={24} strokeWidth={2.5} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </section>
         </div>
