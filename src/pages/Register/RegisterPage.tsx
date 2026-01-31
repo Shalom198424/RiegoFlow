@@ -13,11 +13,7 @@ import {
     ArrowLeft,
     CheckCircle2,
     ChevronRight,
-    Home,
-    Waves,
-    FileText,
-    LayoutGrid,
-    CircleDot
+    Home
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
@@ -151,58 +147,19 @@ export const RegisterPage = () => {
                                 <div className="relative group">
                                     <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
                                     <input
-                                        name="zoneSection"
+                                        name="location"
                                         required={step === 2}
-                                        placeholder="Zona / Sección"
+                                        placeholder="Ubicación (Lote/Sector)"
                                         className="w-full bg-white/5 border border-white/10 h-14 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-600"
                                     />
                                 </div>
                                 <div className="relative group">
-                                    <Waves className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
+                                    <Maximize className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
                                     <input
-                                        name="serviceCanal"
-                                        required={step === 2}
-                                        placeholder="Canal de Servicio"
-                                        className="w-full bg-white/5 border border-white/10 h-14 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-600"
-                                    />
-                                </div>
-                                <div className="relative group">
-                                    <LayoutGrid className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
-                                    <input
-                                        name="parcel"
-                                        required={step === 2}
-                                        placeholder="Parcela"
-                                        className="w-full bg-white/5 border border-white/10 h-14 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-600"
-                                    />
-                                </div>
-                                <div className="relative group">
-                                    <CircleDot className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
-                                    <input
-                                        name="intake"
-                                        required={step === 2}
-                                        placeholder="Toma"
-                                        className="w-full bg-white/5 border border-white/10 h-14 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-600"
-                                    />
-                                </div>
-                                <div className="relative group">
-                                    <Droplets className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
-                                    <input
-                                        name="irrigatedSurface"
+                                        name="hectares"
                                         type="number"
                                         required={step === 2}
-                                        step="0.01"
-                                        placeholder="Superficie Regable (Has)"
-                                        className="w-full bg-white/5 border border-white/10 h-14 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-600"
-                                    />
-                                </div>
-                                <div className="relative group">
-                                    <FileText className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors" size={20} />
-                                    <input
-                                        name="cadastralSurface"
-                                        type="number"
-                                        required={step === 2}
-                                        step="0.01"
-                                        placeholder="Superficie Catastral (Has)"
+                                        placeholder="Hectáreas Totales"
                                         className="w-full bg-white/5 border border-white/10 h-14 pl-12 pr-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-slate-600"
                                     />
                                 </div>
